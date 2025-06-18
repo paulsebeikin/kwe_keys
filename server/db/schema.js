@@ -16,6 +16,8 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     unit TEXT NOT NULL,
     remote_id TEXT UNIQUE NOT NULL,
+    entrance_id INTEGER,
+    exit_id INTEGER,
     assigned_by TEXT NOT NULL,
     assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

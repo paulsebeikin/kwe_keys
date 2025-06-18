@@ -40,15 +40,17 @@ router.get('/history/:unit', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const { unit, remoteId } = req.body;
+    const { unit, remoteId, entranceId, exitId } = req.body;
     
     if (!unit || !remoteId) {
         return res.status(400).json({ message: 'Unit and remoteId are required' });
     }
     
     try {
-        db.prepare('INSERT INTO remotes (unit, remote_id, assigned_by) VALUES (?, ?, ?)').run(unit, remoteId, req.user.username);
-        db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)').run(unit, remoteId, 'assigned', req.user.username);
+        db.prepare('INSERT INTO remotes (unit, remote_id, entrance_id, exit_id, assigned_by) VALUES (?, ?, ?, ?, ?)')
+          .run(unit, remoteId, entranceId || null, exitId || null, req.user.username);
+        db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)')
+          .run(unit, remoteId, 'assigned', req.user.username);
         res.status(201).json({ message: 'Remote assigned successfully' });
     } catch (error) {
         if (error.code === 'SQLITE_CONSTRAINT') {
@@ -62,15 +64,25 @@ router.post('/', (req, res) => {
 router.put('/:remoteId', (req, res) => {
     try {
         const { remoteId } = req.params;
-        const { unit } = req.body;
+        const { unit, entranceId, exitId } = req.body;
         const remote = db.prepare('SELECT * FROM remotes WHERE remote_id = ?').get(remoteId);
         
         if (remote) {
-            db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)').run(remote.unit, remoteId, 'unassigned', req.user.username);
+            db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)')
+              .run(remote.unit, remoteId, 'unassigned', req.user.username);
             
-            db.prepare('UPDATE remotes SET unit = ?, updated_at = ?, updated_by = ? WHERE remote_id = ?').run(unit, new Date().toISOString(), req.user.username, remoteId);
+            db.prepare(`
+                UPDATE remotes 
+                SET unit = ?, 
+                    entrance_id = ?, 
+                    exit_id = ?, 
+                    updated_at = ?, 
+                    updated_by = ? 
+                WHERE remote_id = ?
+            `).run(unit, entranceId || null, exitId || null, new Date().toISOString(), req.user.username, remoteId);
             
-            db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)').run(unit, remoteId, 'reassigned', req.user.username);
+            db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)')
+              .run(unit, remoteId, 'reassigned', req.user.username);
             
             res.json({ message: 'Remote updated successfully' });
         } else {

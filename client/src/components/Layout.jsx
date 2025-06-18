@@ -20,7 +20,7 @@ export default function Layout({ children }) {
             </label>
           </div>
           <div className="flex-1">
-            <span className="text-xl font-bold">KWE Keys</span>
+            <span className="text-xl font-bold">Kingswood Estate Management</span>
           </div>
           <div className="flex-none gap-2">
             {token ? (

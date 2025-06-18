@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 
 function RemoteList() {
   const [remotes, setRemotes] = useState([]);
-  const [newRemote, setNewRemote] = useState({ unit: '', remoteId: '' });
+  const [newRemote, setNewRemote] = useState({ unit: '', remoteId: '', entranceId: '', exitId: '' });
   const [editingRemote, setEditingRemote] = useState(null);
-  const [editUnit, setEditUnit] = useState('');
+  const [editData, setEditData] = useState({ unit: '', entranceId: '', exitId: '' });
   const { token } = useAuth();
 
   const fetchRemotes = async () => {
@@ -24,9 +24,13 @@ function RemoteList() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(newRemote)
+      body: JSON.stringify({
+        ...newRemote,
+        entranceId: newRemote.entranceId ? parseInt(newRemote.entranceId) : null,
+        exitId: newRemote.exitId ? parseInt(newRemote.exitId) : null
+      })
     });
-    setNewRemote({ unit: '', remoteId: '' });
+    setNewRemote({ unit: '', remoteId: '', entranceId: '', exitId: '' });
     fetchRemotes();
   };
 
@@ -37,7 +41,11 @@ function RemoteList() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ unit: editUnit })
+      body: JSON.stringify({
+        unit: editData.unit,
+        entranceId: editData.entranceId ? parseInt(editData.entranceId) : null,
+        exitId: editData.exitId ? parseInt(editData.exitId) : null
+      })
     });
     setEditingRemote(null);
     fetchRemotes();
@@ -55,7 +63,11 @@ function RemoteList() {
 
   const startEdit = (remote) => {
     setEditingRemote(remote.remoteId);
-    setEditUnit(remote.unit);
+    setEditData({
+      unit: remote.unit,
+      entranceId: remote.entranceId || '',
+      exitId: remote.exitId || ''
+    });
   };
 
   useEffect(() => {
@@ -64,7 +76,7 @@ function RemoteList() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Gate Remotes</h2>
+      <h2 className="text-2xl font-bold">Remotes</h2>
       
       <form onSubmit={addRemote} className="flex gap-2">
         <input
@@ -81,9 +93,21 @@ function RemoteList() {
           onChange={e => setNewRemote({...newRemote, remoteId: e.target.value})}
           className="input input-bordered w-full max-w-xs"
         />
-        <button type="submit" className="btn btn-primary">
-          Add Remote
-        </button>
+        <input
+          type="number"
+          placeholder="Entrance ID"
+          value={newRemote.entranceId}
+          onChange={e => setNewRemote({...newRemote, entranceId: e.target.value})}
+          className="input input-bordered w-full max-w-xs"
+        />
+        <input
+          type="number"
+          placeholder="Exit ID"
+          value={newRemote.exitId}
+          onChange={e => setNewRemote({...newRemote, exitId: e.target.value})}
+          className="input input-bordered w-full max-w-xs"
+        />
+        <button type="submit" className="btn btn-primary">Add Remote</button>
       </form>
 
       <div className="overflow-x-auto">
@@ -92,6 +116,8 @@ function RemoteList() {
             <tr>
               <th>Unit</th>
               <th>Remote ID</th>
+              <th>Entrance ID</th>
+              <th>Exit ID</th>
               <th>Assigned Date</th>
               <th>Actions</th>
             </tr>
@@ -103,8 +129,8 @@ function RemoteList() {
                   {editingRemote === remote.remoteId ? (
                     <input
                       type="text"
-                      value={editUnit}
-                      onChange={(e) => setEditUnit(e.target.value)}
+                      value={editData.unit}
+                      onChange={(e) => setEditData({...editData, unit: e.target.value})}
                       className="input input-bordered input-sm"
                     />
                   ) : (
@@ -112,6 +138,30 @@ function RemoteList() {
                   )}
                 </td>
                 <td>{remote.remoteId}</td>
+                <td>
+                  {editingRemote === remote.remoteId ? (
+                    <input
+                      type="number"
+                      value={editData.entranceId}
+                      onChange={(e) => setEditData({...editData, entranceId: e.target.value})}
+                      className="input input-bordered input-sm"
+                    />
+                  ) : (
+                    remote.entranceId
+                  )}
+                </td>
+                <td>
+                  {editingRemote === remote.remoteId ? (
+                    <input
+                      type="number"
+                      value={editData.exitId}
+                      onChange={(e) => setEditData({...editData, exitId: e.target.value})}
+                      className="input input-bordered input-sm"
+                    />
+                  ) : (
+                    remote.exitId
+                  )}
+                </td>
                 <td>{new Date(remote.assignedAt).toLocaleDateString()}</td>
                 <td>
                   {editingRemote === remote.remoteId ? (
