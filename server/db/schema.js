@@ -1,0 +1,34 @@
+const Database = require('better-sqlite3');
+const path = require('path');
+
+const db = new Database(path.join(__dirname, 'kwe_keys.db'));
+
+// Create tables
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS remotes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    unit TEXT NOT NULL,
+    remote_id TEXT UNIQUE NOT NULL,
+    assigned_by TEXT NOT NULL,
+    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS remote_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    unit TEXT NOT NULL,
+    remote_id TEXT NOT NULL,
+    action TEXT NOT NULL,
+    by TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+module.exports = db;
