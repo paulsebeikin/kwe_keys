@@ -63,88 +63,90 @@ function RemoteList() {
   }, []);
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Gate Remotes</h2>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold">Gate Remotes</h2>
       
-      <form onSubmit={addRemote} className="mb-4">
+      <form onSubmit={addRemote} className="flex gap-2">
         <input
           type="text"
           placeholder="Unit Number"
           value={newRemote.unit}
           onChange={e => setNewRemote({...newRemote, unit: e.target.value})}
-          className="border p-2 mr-2"
+          className="input input-bordered w-full max-w-xs"
         />
         <input
           type="text"
           placeholder="Remote ID"
           value={newRemote.remoteId}
           onChange={e => setNewRemote({...newRemote, remoteId: e.target.value})}
-          className="border p-2 mr-2"
+          className="input input-bordered w-full max-w-xs"
         />
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+        <button type="submit" className="btn btn-primary">
           Add Remote
         </button>
       </form>
 
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th>Unit</th>
-            <th>Remote ID</th>
-            <th>Assigned Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {remotes.map(remote => (
-            <tr key={remote.remoteId}>
-              <td>
-                {editingRemote === remote.remoteId ? (
-                  <input
-                    type="text"
-                    value={editUnit}
-                    onChange={(e) => setEditUnit(e.target.value)}
-                    className="border p-1"
-                  />
-                ) : (
-                  remote.unit
-                )}
-              </td>
-              <td>{remote.remoteId}</td>
-              <td>{new Date(remote.assignedAt).toLocaleDateString()}</td>
-              <td>
-                {editingRemote === remote.remoteId ? (
-                  <div className="space-x-2">
-                    <button 
-                      onClick={() => updateRemote(remote.remoteId)}
-                      className="text-green-500 hover:text-green-700">
-                      Save
-                    </button>
-                    <button 
-                      onClick={() => setEditingRemote(null)}
-                      className="text-gray-500 hover:text-gray-700">
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-x-2">
-                    <button 
-                      onClick={() => startEdit(remote)}
-                      className="text-blue-500 hover:text-blue-700">
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => deleteRemote(remote.remoteId)}
-                      className="text-red-500 hover:text-red-700">
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </td>
+      <div className="overflow-x-auto">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Unit</th>
+              <th>Remote ID</th>
+              <th>Assigned Date</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {remotes.map(remote => (
+              <tr key={remote.remoteId}>
+                <td>
+                  {editingRemote === remote.remoteId ? (
+                    <input
+                      type="text"
+                      value={editUnit}
+                      onChange={(e) => setEditUnit(e.target.value)}
+                      className="input input-bordered input-sm"
+                    />
+                  ) : (
+                    remote.unit
+                  )}
+                </td>
+                <td>{remote.remoteId}</td>
+                <td>{new Date(remote.assignedAt).toLocaleDateString()}</td>
+                <td>
+                  {editingRemote === remote.remoteId ? (
+                    <div className="space-x-2">
+                      <button 
+                        onClick={() => updateRemote(remote.remoteId)}
+                        className="btn btn-sm btn-success">
+                        Save
+                      </button>
+                      <button 
+                        onClick={() => setEditingRemote(null)}
+                        className="btn btn-sm">
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-x-2">
+                      <button 
+                        onClick={() => startEdit(remote)}
+                        className="btn btn-sm btn-info">
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => deleteRemote(remote.remoteId)}
+                        className="btn btn-sm btn-error">
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
