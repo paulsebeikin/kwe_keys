@@ -43,9 +43,14 @@ export default function Layout({ children }) {
       {/* Sidebar */}
       <div className="drawer-side">
         <label htmlFor="my-drawer-2" className="drawer-overlay"></label> 
-        <ul className="menu p-4 w-80 min-h-full bg-base-200">
+        <ul className="menu p-4 w-40 min-h-full bg-base-200">
           <li>
-            <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+            <Link to="/units" className={location.pathname === '/units' ? 'active' : ''}>
+              Units
+            </Link>
+          </li>
+          <li>
+            <Link to="/remotes" className={location.pathname === '/remotes' ? 'active' : ''}>
               Remotes
             </Link>
           </li>

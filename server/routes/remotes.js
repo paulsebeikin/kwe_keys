@@ -1,23 +1,8 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const router = express.Router();
 const db = require('../db/schema');
+const { authenticateToken } = require('../middleware/auth');
 
-// Authentication middleware
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    
-    if (!token) return res.status(401).json({ message: 'No token provided' });
-    
-    jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err, user) => {
-        if (err) return res.status(403).json({ message: 'Invalid token' });
-        req.user = user;
-        next();
-    });
-};
-
-// Apply authentication to all routes
 router.use(authenticateToken);
 
 router.get('/', (req, res) => {
@@ -29,10 +14,10 @@ router.get('/', (req, res) => {
     }
 });
 
-router.get('/history/:unit', (req, res) => {
+router.get('/history/:unitNumber', (req, res) => {
     try {
-        const { unit } = req.params;
-        const history = db.prepare('SELECT * FROM remote_history WHERE unit = ? ORDER BY created_at DESC').all(unit);
+        const { unitNumber } = req.params;
+        const history = db.prepare('SELECT * FROM remote_history WHERE unit_number = ? ORDER BY created_at DESC').all(parseInt(unitNumber));
         res.json(history);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -40,17 +25,17 @@ router.get('/history/:unit', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const { unit, remoteId, entranceId, exitId } = req.body;
+    const { unitNumber, remoteId, entranceId, exitId } = req.body;
     
-    if (!unit || !remoteId) {
-        return res.status(400).json({ message: 'Unit and remoteId are required' });
+    if (!unitNumber || !remoteId) {
+        return res.status(400).json({ message: 'Unit number and remoteId are required' });
     }
     
     try {
-        db.prepare('INSERT INTO remotes (unit, remote_id, entrance_id, exit_id, assigned_by) VALUES (?, ?, ?, ?, ?)')
-          .run(unit, remoteId, entranceId || null, exitId || null, req.user.username);
-        db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)')
-          .run(unit, remoteId, 'assigned', req.user.username);
+        db.prepare('INSERT INTO remotes (unit_number, remote_id, entrance_id, exit_id, assigned_by) VALUES (?, ?, ?, ?, ?)')
+          .run(parseInt(unitNumber), remoteId, entranceId || null, exitId || null, req.user.username);
+        db.prepare('INSERT INTO remote_history (unit_number, remote_id, action, by) VALUES (?, ?, ?, ?)')
+          .run(parseInt(unitNumber), remoteId, 'assigned', req.user.username);
         res.status(201).json({ message: 'Remote assigned successfully' });
     } catch (error) {
         if (error.code === 'SQLITE_CONSTRAINT') {
@@ -64,25 +49,18 @@ router.post('/', (req, res) => {
 router.put('/:remoteId', (req, res) => {
     try {
         const { remoteId } = req.params;
-        const { unit, entranceId, exitId } = req.body;
+        const { unitNumber } = req.body;
         const remote = db.prepare('SELECT * FROM remotes WHERE remote_id = ?').get(remoteId);
         
         if (remote) {
-            db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)')
-              .run(remote.unit, remoteId, 'unassigned', req.user.username);
+            db.prepare('INSERT INTO remote_history (unit_number, remote_id, action, by) VALUES (?, ?, ?, ?)')
+              .run(remote.unit_number, remoteId, 'unassigned', req.user.username);
             
-            db.prepare(`
-                UPDATE remotes 
-                SET unit = ?, 
-                    entrance_id = ?, 
-                    exit_id = ?, 
-                    updated_at = ?, 
-                    updated_by = ? 
-                WHERE remote_id = ?
-            `).run(unit, entranceId || null, exitId || null, new Date().toISOString(), req.user.username, remoteId);
+            db.prepare('UPDATE remotes SET unit_number = ?, updated_at = ?, updated_by = ? WHERE remote_id = ?')
+              .run(parseInt(unitNumber), new Date().toISOString(), req.user.username, remoteId);
             
-            db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)')
-              .run(unit, remoteId, 'reassigned', req.user.username);
+            db.prepare('INSERT INTO remote_history (unit_number, remote_id, action, by) VALUES (?, ?, ?, ?)')
+              .run(parseInt(unitNumber), remoteId, 'reassigned', req.user.username);
             
             res.json({ message: 'Remote updated successfully' });
         } else {
@@ -99,7 +77,8 @@ router.delete('/:remoteId', (req, res) => {
         const remote = db.prepare('SELECT * FROM remotes WHERE remote_id = ?').get(remoteId);
         
         if (remote) {
-            db.prepare('INSERT INTO remote_history (unit, remote_id, action, by) VALUES (?, ?, ?, ?)').run(remote.unit, remoteId, 'deleted', req.user.username);
+            db.prepare('INSERT INTO remote_history (unit_number, remote_id, action, by) VALUES (?, ?, ?, ?)')
+              .run(remote.unit_number, remoteId, 'deleted', req.user.username);
             
             db.prepare('DELETE FROM remotes WHERE remote_id = ?').run(remoteId);
             res.json({ message: 'Remote deleted successfully' });

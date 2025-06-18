@@ -3,10 +3,19 @@ import { useAuth } from '../context/AuthContext';
 
 function RemoteList() {
   const [remotes, setRemotes] = useState([]);
-  const [newRemote, setNewRemote] = useState({ unit: '', remoteId: '', entranceId: '', exitId: '' });
+  const [units, setUnits] = useState([]);
+  const [newRemote, setNewRemote] = useState({ unitNumber: '', remoteId: '', entranceId: '', exitId: '' });
   const [editingRemote, setEditingRemote] = useState(null);
-  const [editData, setEditData] = useState({ unit: '', entranceId: '', exitId: '' });
+  const [editData, setEditData] = useState({ unitNumber: '', entranceId: '', exitId: '' });
   const { token } = useAuth();
+
+  const fetchUnits = async () => {
+    const response = await fetch('/api/units', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    setUnits(data);
+  };
 
   const fetchRemotes = async () => {
     const response = await fetch('/api/remotes', {
@@ -26,11 +35,12 @@ function RemoteList() {
       },
       body: JSON.stringify({
         ...newRemote,
+        unitNumber: parseInt(newRemote.unitNumber),
         entranceId: newRemote.entranceId ? parseInt(newRemote.entranceId) : null,
         exitId: newRemote.exitId ? parseInt(newRemote.exitId) : null
       })
     });
-    setNewRemote({ unit: '', remoteId: '', entranceId: '', exitId: '' });
+    setNewRemote({ unitNumber: '', remoteId: '', entranceId: '', exitId: '' });
     fetchRemotes();
   };
 
@@ -42,7 +52,7 @@ function RemoteList() {
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
-        unit: editData.unit,
+        unitNumber: parseInt(editData.unitNumber),
         entranceId: editData.entranceId ? parseInt(editData.entranceId) : null,
         exitId: editData.exitId ? parseInt(editData.exitId) : null
       })
@@ -64,7 +74,7 @@ function RemoteList() {
   const startEdit = (remote) => {
     setEditingRemote(remote.remoteId);
     setEditData({
-      unit: remote.unit,
+      unitNumber: remote.unitNumber,
       entranceId: remote.entranceId || '',
       exitId: remote.exitId || ''
     });
@@ -72,6 +82,7 @@ function RemoteList() {
 
   useEffect(() => {
     fetchRemotes();
+    fetchUnits();
   }, []);
 
   return (
@@ -79,13 +90,20 @@ function RemoteList() {
       <h2 className="text-2xl font-bold">Remotes</h2>
       
       <form onSubmit={addRemote} className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Unit Number"
-          value={newRemote.unit}
-          onChange={e => setNewRemote({...newRemote, unit: e.target.value})}
-          className="input input-bordered w-full max-w-xs"
-        />
+        <select
+          value={newRemote.unitNumber}
+          onChange={e => setNewRemote({...newRemote, unitNumber: e.target.value})}
+          className="select select-bordered w-full max-w-xs"
+          required
+        >
+          <option value="">Select Unit</option>
+          {units.map(unit => (
+            <option key={unit.unitNumber} value={unit.unitNumber}>
+              Unit {unit.unitNumber}
+            </option>
+          ))}
+        </select>
+
         <input
           type="text"
           placeholder="Remote ID"
@@ -114,7 +132,7 @@ function RemoteList() {
         <table className="table">
           <thead>
             <tr>
-              <th>Unit</th>
+              <th>Unit Number</th>
               <th>Remote ID</th>
               <th>Entrance ID</th>
               <th>Exit ID</th>
@@ -127,14 +145,19 @@ function RemoteList() {
               <tr key={remote.remoteId}>
                 <td>
                   {editingRemote === remote.remoteId ? (
-                    <input
-                      type="text"
-                      value={editData.unit}
-                      onChange={(e) => setEditData({...editData, unit: e.target.value})}
-                      className="input input-bordered input-sm"
-                    />
+                    <select
+                      value={editData.unitNumber}
+                      onChange={(e) => setEditData({...editData, unitNumber: e.target.value})}
+                      className="select select-bordered select-sm w-full max-w-xs"
+                    >
+                      {units.map(unit => (
+                        <option key={unit.unitNumber} value={unit.unitNumber}>
+                          {unit.unitNumber}
+                        </option>
+                      ))}
+                    </select>
                   ) : (
-                    remote.unit
+                    `Unit ${remote.unitNumber}`
                   )}
                 </td>
                 <td>{remote.remoteId}</td>

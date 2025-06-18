@@ -12,20 +12,30 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS units (
+    unit_number INTEGER PRIMARY KEY,
+    owner TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  DROP TABLE IF EXISTS remotes;
+  
   CREATE TABLE IF NOT EXISTS remotes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    unit TEXT NOT NULL,
+    unit_number INTEGER NOT NULL,
     remote_id TEXT UNIQUE NOT NULL,
     entrance_id INTEGER,
     exit_id INTEGER,
     assigned_by TEXT NOT NULL,
     assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (unit_number) REFERENCES units(unit_number) ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS remote_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    unit TEXT NOT NULL,
+    unit_number INTEGER NOT NULL,
     remote_id TEXT NOT NULL,
     action TEXT NOT NULL,
     by TEXT NOT NULL,

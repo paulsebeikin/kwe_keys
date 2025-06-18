@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Login from './components/Login';
 import Register from './components/Register';
 import RemoteList from './components/RemoteList';
+import UnitList from './components/UnitList';
 import './App.css'
 
 const ProtectedRoute = ({ children }) => {
@@ -19,7 +20,14 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/" element={
+            {/* navigates to the units list by default */}
+            <Route path="/" element={<Navigate to="/units" replace />} />
+            <Route path="/units" element={
+              <ProtectedRoute>
+                <UnitList />
+              </ProtectedRoute>
+            } />
+            <Route path="/remotes" element={
               <ProtectedRoute>
                 <RemoteList />
               </ProtectedRoute>
