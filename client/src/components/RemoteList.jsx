@@ -118,12 +118,12 @@ function RemoteList() {
                     <div className="space-x-2">
                       <button 
                         onClick={() => updateRemote(remote.remoteId)}
-                        className="btn btn-sm btn-success">
+                        className="btn btn-sm btn-success btn-soft">
                         Save
                       </button>
                       <button 
                         onClick={() => setEditingRemote(null)}
-                        className="btn btn-sm">
+                        className="btn btn-sm btn-soft">
                         Cancel
                       </button>
                     </div>
@@ -131,12 +131,12 @@ function RemoteList() {
                     <div className="space-x-2">
                       <button 
                         onClick={() => startEdit(remote)}
-                        className="btn btn-sm btn-info">
+                        className="btn btn-sm btn-info btn-soft">
                         Edit
                       </button>
                       <button 
                         onClick={() => deleteRemote(remote.remoteId)}
-                        className="btn btn-sm btn-error">
+                        className="btn btn-sm btn-error btn-soft">
                         Delete
                       </button>
                     </div>
