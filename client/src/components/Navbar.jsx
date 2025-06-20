@@ -22,7 +22,6 @@ export default function Navbar() {
         ) : (
           <div className="flex gap-2">
             <Link to="/login" className="btn btn-ghost">Login</Link>
-            <Link to="/register" className="btn btn-ghost">Register</Link>
           </div>
         )}
       </div>

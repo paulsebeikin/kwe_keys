@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
-import Register from './components/Register';
 import RemoteList from './components/RemoteList';
 import UnitList from './components/UnitList';
 import './App.css'
@@ -19,7 +18,6 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             {/* navigates to the units list by default */}
             <Route path="/" element={<Navigate to="/units" replace />} />
             <Route path="/units" element={

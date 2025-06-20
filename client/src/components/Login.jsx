@@ -73,15 +73,11 @@ function Login({ inline = false, onSuccess = null }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="fixed inset-0 flex items-center justify-center min-h-screen bg-base-200">
       <div className="card bg-base-100 shadow-xl w-96">
         <div className="card-body">
           <h2 className="card-title justify-center mb-4">Sign in to your account</h2>
           {formContent}
-          <div className="divider">OR</div>
-          <Link to="/register" className="btn btn-outline btn-block">
-            Register new account
-          </Link>
         </div>
       </div>
     </div>

@@ -31,25 +31,4 @@ router.post('/login', validateInput, async (req, res) => {
     }
 });
 
-router.post('/register', validateInput, async (req, res) => {
-    try {
-        const { username, password } = req.body;
-        const stmt = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-        const hashedPassword = await bcrypt.hash(password, 10);
-        
-        try {
-            stmt.run(username, hashedPassword);
-            res.status(201).json({ message: 'User registered successfully' });
-        } catch (err) {
-            if (err.code === 'SQLITE_CONSTRAINT') {
-                res.status(400).json({ message: 'Username already exists' });
-            } else {
-                throw err;
-            }
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
 module.exports = router;
