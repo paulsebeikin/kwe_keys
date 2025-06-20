@@ -5,21 +5,27 @@ export default function Navbar() {
   const { token, logout } = useAuth();
 
   return (
-    <nav className="bg-gray-800 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">KWE Keys</Link>
-        <div>
-          {token ? (
-            <button onClick={logout} className="hover:text-gray-300">
-              Logout
-            </button>
-          ) : (
-            <Link to="/login" className="hover:text-gray-300">
-              Login
-            </Link>
-          )}
-        </div>
+    <div className="navbar bg-base-100">
+      <div className="flex-none lg:hidden">
+        <label htmlFor="my-drawer-2" className="btn btn-square btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </label>
       </div>
-    </nav>
+      <div className="flex-1">
+        <span className="text-xl font-bold">Kingswood Estate Management</span>
+      </div>
+      <div className="flex-none gap-2">
+        {token ? (
+          <button onClick={logout} className="btn btn-ghost">Logout</button>
+        ) : (
+          <div className="flex gap-2">
+            <Link to="/login" className="btn btn-ghost">Login</Link>
+            <Link to="/register" className="btn btn-ghost">Register</Link>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
