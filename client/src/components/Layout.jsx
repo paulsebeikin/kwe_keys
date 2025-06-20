@@ -40,22 +40,24 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      {/* Sidebar */}
-      <div className="drawer-side">
-        <label htmlFor="my-drawer-2" className="drawer-overlay"></label> 
-        <ul className="menu p-4 w-40 min-h-full bg-base-200">
-          <li>
-            <Link to="/units" className={location.pathname === '/units' ? 'active' : ''}>
-              Units
-            </Link>
-          </li>
-          <li>
-            <Link to="/remotes" className={location.pathname === '/remotes' ? 'active' : ''}>
-              Remotes
-            </Link>
-          </li>
-        </ul>
-      </div>
+      {/* Sidebar: Only show if logged in */}
+      {token && (
+        <div className="drawer-side">
+          <label htmlFor="my-drawer-2" className="drawer-overlay"></label> 
+          <ul className="menu p-4 w-40 min-h-full bg-base-200">
+            <li>
+              <Link to="/units" className={location.pathname === '/units' ? 'active' : ''}>
+                Units
+              </Link>
+            </li>
+            <li>
+              <Link to="/remotes" className={location.pathname === '/remotes' ? 'active' : ''}>
+                Remotes
+              </Link>
+            </li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
