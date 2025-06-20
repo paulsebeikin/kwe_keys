@@ -21,8 +21,22 @@ router.post('/login', validateInput, async (req, res) => {
         const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
         
         if (user && await bcrypt.compare(password, user.password)) {
-            const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
-            res.json({ token });
+            const token = jwt.sign(
+                {
+                    username,
+                    firstName: user.first_name,
+                    lastName: user.last_name,
+                    email: user.email
+                },
+                JWT_SECRET,
+                { expiresIn: '24h' }
+            );
+            res.json({
+                token,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email
+            });
         } else {
             res.status(401).json({ message: 'Invalid credentials' });
         }

@@ -9,6 +9,9 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    email TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 

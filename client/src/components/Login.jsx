@@ -20,8 +20,8 @@ function Login({ inline = false, onSuccess = null }) {
       
       if (!response.ok) throw new Error('Invalid credentials');
       
-      const { token } = await response.json();
-      login(token);
+      const { token, firstName, lastName } = await response.json();
+      login(token, { firstName, lastName });
       if (onSuccess) onSuccess();
       if (!inline) navigate('/');
     } catch (err) {

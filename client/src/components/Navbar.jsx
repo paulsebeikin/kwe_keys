@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
-  const { token, logout } = useAuth();
+  const { token, logout, firstName, lastName } = useAuth();
 
   return (
     <div className="navbar bg-base-100">
@@ -16,9 +16,12 @@ export default function Navbar() {
       <div className="flex-1">
         <span className="text-xl font-bold">Kingswood Estate Management</span>
       </div>
-      <div className="flex-none gap-2">
+      <div className="flex-none gap-2 flex items-center">
         {token ? (
-          <button onClick={logout} className="btn btn-ghost">Logout</button>
+          <>
+            <span className="font-medium mr-2">{firstName} {lastName}</span>
+            <button onClick={logout} className="btn btn-ghost">Logout</button>
+          </>
         ) : (
           <div className="flex gap-2">
             <Link to="/login" className="btn btn-ghost">Login</Link>
