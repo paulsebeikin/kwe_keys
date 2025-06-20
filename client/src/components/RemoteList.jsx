@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import useUnitSearch from '../hooks/useUnitSearch';
 
 function RemoteList() {
   const [remotes, setRemotes] = useState([]);
@@ -8,6 +9,8 @@ function RemoteList() {
   const [editingRemote, setEditingRemote] = useState(null);
   const [editData, setEditData] = useState({ unitNumber: '', entranceId: '', exitId: '' });
   const { token } = useAuth();
+
+  const { search, setSearch, filteredItems } = useUnitSearch(remotes, 'unitNumber');
 
   const fetchUnits = async () => {
     const response = await fetch('/api/units', {
@@ -89,6 +92,14 @@ function RemoteList() {
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Remotes</h2>
       
+      <input
+        type="text"
+        placeholder="Search by Unit number"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="input input-bordered w-full max-w-xs"
+      />
+
       <form onSubmit={addRemote} className="flex gap-2">
         <select
           value={newRemote.unitNumber}
@@ -141,7 +152,7 @@ function RemoteList() {
             </tr>
           </thead>
           <tbody>
-            {remotes.map(remote => (
+            {filteredItems.map(remote => (
               <tr key={remote.remoteId}>
                 <td>
                   {editingRemote === remote.remoteId ? (

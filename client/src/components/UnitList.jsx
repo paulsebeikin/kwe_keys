@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import useUnitSearch from '../hooks/useUnitSearch';
 
 function UnitList() {
   const [units, setUnits] = useState([]);
@@ -7,6 +8,8 @@ function UnitList() {
   const [editingUnit, setEditingUnit] = useState(null);
   const [editData, setEditData] = useState({ owner: '' });
   const { token } = useAuth();
+
+  const { search, setSearch, filteredItems } = useUnitSearch(units);
 
   const fetchUnits = async () => {
     const response = await fetch('/api/units', {
@@ -64,6 +67,14 @@ function UnitList() {
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Units</h2>
       
+      <input
+        type="text"
+        placeholder="Search by Unit number"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="input input-bordered w-full max-w-xs"
+      />
+
       <form onSubmit={addUnit} className="flex gap-2">
         <input
           type="number"
@@ -92,7 +103,7 @@ function UnitList() {
             </tr>
           </thead>
           <tbody>
-            {units.map(unit => (
+            {filteredItems.map(unit => (
               <tr key={unit.unitNumber}>
                 <td>{parseInt(unit.unitNumber)}</td>
                 <td>
