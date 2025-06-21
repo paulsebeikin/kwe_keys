@@ -2,7 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
-const db = require('../db/schema');
+const { sql } = require('../db/schema');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -18,7 +18,8 @@ const validateInput = (req, res, next) => {
 router.post('/login', validateInput, async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+        const result = await sql`SELECT * FROM users WHERE username = ${username}`;
+        const user = result[0];
         
         if (user && await bcrypt.compare(password, user.password)) {
             const token = jwt.sign(
@@ -41,6 +42,7 @@ router.post('/login', validateInput, async (req, res) => {
             res.status(401).json({ message: 'Invalid credentials' });
         }
     } catch (error) {
+        console.error('Login error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

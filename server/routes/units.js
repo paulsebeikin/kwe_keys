@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/schema');
+const { sql } = require('../db/schema');
 const { authenticateToken } = require('../middleware/auth');
 
 router.use(authenticateToken);
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const units = db.prepare('SELECT * FROM units ORDER BY unit_number').all();
-        res.json(units);
+        const result = await sql`SELECT * FROM units ORDER BY unit_number`;
+        res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const { unitNumber, owner } = req.body;
     
     if (!unitNumber || !owner) {
@@ -22,11 +22,10 @@ router.post('/', (req, res) => {
     }
     
     try {
-        db.prepare('INSERT INTO units (unit_number, owner) VALUES (?, ?)')
-          .run(parseInt(unitNumber), owner);
+        await sql`INSERT INTO units (unit_number, owner) VALUES (${parseInt(unitNumber)}, ${owner})`;
         res.status(201).json({ message: 'Unit created successfully' });
     } catch (error) {
-        if (error.code === 'SQLITE_CONSTRAINT') {
+        if (error.code === '23505') {
             res.status(400).json({ message: 'Unit number already exists' });
         } else {
             res.status(500).json({ message: 'Server error' });
@@ -34,15 +33,14 @@ router.post('/', (req, res) => {
     }
 });
 
-router.put('/:unitNumber', (req, res) => {
+router.put('/:unitNumber', async (req, res) => {
     try {
         const unitNumber = parseInt(req.params.unitNumber);
         const { owner } = req.body;
         
-        const result = db.prepare('UPDATE units SET owner = ?, updated_at = ? WHERE unit_number = ?')
-          .run(owner, new Date().toISOString(), unitNumber);
+        const result = await sql`UPDATE units SET owner = ${owner}, updated_at = NOW() WHERE unit_number = ${unitNumber}`;
         
-        if (result.changes > 0) {
+        if (result.length > 0) {
             res.json({ message: 'Unit updated successfully' });
         } else {
             res.status(404).json({ message: 'Unit not found' });
@@ -52,12 +50,12 @@ router.put('/:unitNumber', (req, res) => {
     }
 });
 
-router.delete('/:unitNumber', (req, res) => {
+router.delete('/:unitNumber', async (req, res) => {
     try {
         const unitNumber = parseInt(req.params.unitNumber);
-        const result = db.prepare('DELETE FROM units WHERE unit_number = ?').run(unitNumber);
+        const result = await sql`DELETE FROM units WHERE unit_number = ${unitNumber}`;
         
-        if (result.changes > 0) {
+        if (result.length > 0) {
             res.json({ message: 'Unit deleted successfully' });
         } else {
             res.status(404).json({ message: 'Unit not found' });

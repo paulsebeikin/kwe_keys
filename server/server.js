@@ -5,6 +5,7 @@ const { snakeToCamel } = require('./utils/caseConverter');
 const authRoutes = require('./routes/auth');
 const remoteRoutes = require('./routes/remotes');
 const unitRoutes = require('./routes/units');
+const { initializeSchema } = require('./db/schema');
 
 const app = express();
 app.use(cors());
@@ -25,4 +26,9 @@ app.use('/remotes', remoteRoutes);
 app.use('/units', unitRoutes);
 
 const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+(async () => {
+  console.log('Initializing database schema...');
+  await initializeSchema();
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+})();
