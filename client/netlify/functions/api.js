@@ -1,8 +1,8 @@
 import serverless from "serverless-http";
 import express from "express";
-const authRoutes = require('../../routes/auth');
-const remoteRoutes = require('../../routes/remotes');
-const unitRoutes = require('../../routes/units');
+const authRoutes = require('../../../server/routes/auth');
+const remoteRoutes = require('../../../server/routes/remotes');
+const unitRoutes = require('../../../server/routes/units');
 
 const api = express();
 
