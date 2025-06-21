@@ -1,5 +1,5 @@
 [functions]
-  directory = "server/netlify/functions"
+  directory = "netlify/functions"
   external_node_modules = ["express", "serverless-http", "@neondatabase/serverless", "bcryptjs"]
 
 [[redirects]]
