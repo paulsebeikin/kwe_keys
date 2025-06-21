@@ -1,11 +1,5 @@
 [functions]
-  directory = "netlify/functions"
   external_node_modules = ["express", "serverless-http", "@neondatabase/serverless", "bcryptjs"]
-
-[build]
-  base = "client"
-  command = "vite build"
-  publish = "dist"
 
 [[redirects]]
   from = "/api/*"
