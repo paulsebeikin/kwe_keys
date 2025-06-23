@@ -1,5 +1,6 @@
 [functions]
   external_node_modules = ["express", "serverless-http", "@neondatabase/serverless", "bcryptjs"]
+  included_files = ["server/routes/**"]
 
 [[redirects]]
   from = "/api/*"
