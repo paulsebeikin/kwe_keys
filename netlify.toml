@@ -1,5 +1,5 @@
 [functions]
-  external_node_modules = ["express", "serverless-http", "@neondatabase/serverless", "bcryptjs". "body-parser", "cors", "dotenv", "jsonwebtoken"]
+  external_node_modules = ["express", "serverless-http", "@neondatabase/serverless", "bcryptjs", "body-parser", "cors", "dotenv", "jsonwebtoken"]
   included_files = ["server/routes/**"]
 
 [[redirects]]
