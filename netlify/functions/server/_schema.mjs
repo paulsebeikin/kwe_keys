@@ -1,7 +1,10 @@
-require('dotenv').config();
-const { neon } = require('@neondatabase/serverless');
+import dotenv from 'dotenv';
+import { neon } from '@neondatabase/serverless';
+import process from 'process';
 
-const sql = neon(process.env.DATABASE_URL);
+dotenv.config();
+
+const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 async function createUsersTable() {
   await sql`
@@ -69,4 +72,4 @@ async function initializeSchema() {
   await createRemoteHistoryTable();
 }
 
-module.exports = { sql, initializeSchema };
+export { sql, initializeSchema };
