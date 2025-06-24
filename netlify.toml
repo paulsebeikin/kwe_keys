@@ -1,8 +1,2 @@
 [functions]
   external_node_modules = ["express", "serverless-http", "@neondatabase/serverless", "bcryptjs", "body-parser", "cors", "dotenv", "jsonwebtoken"]
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200
-  force = true
