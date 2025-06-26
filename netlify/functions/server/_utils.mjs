@@ -23,7 +23,11 @@ export async function authenticateToken(request) {
 export function snakeToCamel(obj) {
   if (Array.isArray(obj)) {
     return obj.map(snakeToCamel);
-  } else if (obj && typeof obj === 'object') {
+  } else if (
+    obj &&
+    typeof obj === 'object' &&
+    obj.constructor === Object // Only plain objects
+  ) {
     return Object.fromEntries(
       Object.entries(obj).map(([key, value]) => [
         key.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
