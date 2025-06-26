@@ -1,2 +1,14 @@
 [functions]
   external_node_modules = ["express", "serverless-http", "@neondatabase/serverless", "bcryptjs", "body-parser", "cors", "dotenv", "jsonwebtoken"]
+
+[[redirects]]
+  from = "/api/units/*"
+  to = "/.netlify/functions/units/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/remotes/*"
+  to = "/.netlify/functions/remotes/:splat"
+  status = 200
+  force = true

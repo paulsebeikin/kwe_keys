@@ -1,10 +1,6 @@
 import { sql } from './server/_schema.mjs';
 import { parseBody, authenticateToken, snakeToCamel } from './server/_utils.mjs';
 
-export const config = {
-  path: '/api/remotes'
-}
-
 export default async (request, context) => {
   const user = await authenticateToken(request);
   if (!user) {
@@ -15,14 +11,18 @@ export default async (request, context) => {
   }
 
   const url = new URL(request.url);
-  const pathname = url.pathname.replace(/api\/remotes/, '') || '/';
-
-  console.log(`Handling request for ${pathname} with method ${request.method}`);
+  // Remove leading /api/remotes and any trailing slash (except for root)
+  let pathname = url.pathname.replace(/^\/api\/remotes/, '');
+  if (pathname === '' || pathname === '/') {
+    pathname = '/';
+  } else {
+    pathname = pathname.replace(/\/+$/, '');
+  }
 
   try {
     // GET /remotes
     if (request.method === 'GET' && pathname === '/') {
-      const result = await sql`SELECT * FROM remotes ORDER BY assigned_at DESC`;
+      const result = await sql`SELECT * FROM remotes ORDER BY assigned_at DESC`;      
       return new Response(JSON.stringify(snakeToCamel(result)), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
@@ -49,7 +49,8 @@ export default async (request, context) => {
         });
       }
       try {
-        await sql`INSERT INTO remotes (unit_number, remote_id, entrance_id, exit_id, assigned_by) VALUES (${parseInt(unitNumber)}, ${remoteId}, ${entranceId || null}, ${exitId || null}, ${user.username})`;
+        const now = new Date().toISOString();
+        await sql`INSERT INTO remotes (unit_number, remote_id, entrance_id, exit_id, assigned_by, assigned_at, updated_at) VALUES (${parseInt(unitNumber)}, ${remoteId}, ${entranceId || null}, ${exitId || null}, ${user.username}, ${now}, ${now})`;
         await sql`INSERT INTO remote_history (unit_number, remote_id, action, by) VALUES (${parseInt(unitNumber)}, ${remoteId}, 'assigned', ${user.username})`;
         return new Response(JSON.stringify({ message: 'Remote assigned successfully' }), {
           status: 201,
@@ -69,12 +70,12 @@ export default async (request, context) => {
     // PUT /remotes/:remoteId
     if (request.method === 'PUT' && /^\/\w+$/.test(pathname)) {
       const remoteId = pathname.split('/')[1];
-      const { unitNumber } = await parseBody(request);
+      const { unitNumber, entranceId, exitId } = await parseBody(request);
       const result = await sql`SELECT * FROM remotes WHERE remote_id = ${remoteId}`;
       const remote = result[0];
       if (remote) {
         await sql`INSERT INTO remote_history (unit_number, remote_id, action, by) VALUES (${remote.unit_number}, ${remoteId}, 'unassigned', ${user.username})`;
-        await sql`UPDATE remotes SET unit_number = ${parseInt(unitNumber)}, updated_at = ${new Date().toISOString()}, updated_by = ${user.username} WHERE remote_id = ${remoteId}`;
+        await sql`UPDATE remotes SET unit_number = ${parseInt(unitNumber)}, entrance_id = ${entranceId}, exit_id = ${exitId}, updated_at = ${new Date().toISOString()} WHERE remote_id = ${remoteId}`;
         await sql`INSERT INTO remote_history (unit_number, remote_id, action, by) VALUES (${parseInt(unitNumber)}, ${remoteId}, 'reassigned', ${user.username})`;
         return new Response(JSON.stringify({ message: 'Remote updated successfully' }), {
           status: 200,
@@ -114,6 +115,7 @@ export default async (request, context) => {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
+    console.error('Error handling request:', error);
     return new Response(JSON.stringify({ message: 'Server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

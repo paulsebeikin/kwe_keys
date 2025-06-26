@@ -1,10 +1,6 @@
 import { sql } from './server/_schema.mjs';
 import { parseBody, authenticateToken, snakeToCamel } from './server/_utils.mjs';
 
-export const config = {
-  path: '/api/units'
-}
-
 export default async (request, context) => {
   const user = await authenticateToken(request);
   if (!user) {
@@ -15,7 +11,15 @@ export default async (request, context) => {
   }
 
   const url = new URL(request.url);
-  const pathname = url.pathname.replace(/api\/units/, '') || '/';
+  // Remove leading /api/remotes and any trailing slash (except for root)
+  let pathname = url.pathname.replace(/^\/api\/units/, '');
+  if (pathname === '' || pathname === '/') {
+    pathname = '/';
+  } else {
+    pathname = pathname.replace(/\/+$/, '');
+  }
+
+  console.log(`Handling request: ${request.method} ${pathname}`);
 
   try {
     // GET /units
@@ -56,36 +60,38 @@ export default async (request, context) => {
     // PUT /units/:unitNumber
     if (request.method === 'PUT' && /^\/\d+$/.test(pathname)) {
       const unitNumber = parseInt(pathname.split('/')[1]);
-      const { owner } = await parseBody(request);
-      const result = await sql`UPDATE units SET owner = ${owner}, updated_at = NOW() WHERE unit_number = ${unitNumber}`;
-      if (result.length > 0) {
-        return new Response(JSON.stringify({ message: 'Unit updated successfully' }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      } else {
+      // Check if unit exists
+      const existingUnit = await sql`SELECT * FROM units WHERE unit_number = ${unitNumber}`;
+      if (existingUnit.length === 0) {
         return new Response(JSON.stringify({ message: 'Unit not found' }), {
           status: 404,
           headers: { 'Content-Type': 'application/json' }
         });
       }
+      const { owner } = await parseBody(request);
+      await sql`UPDATE units SET owner = ${owner}, updated_at = NOW() WHERE unit_number = ${unitNumber}`;
+      return new Response(JSON.stringify({ message: 'Unit updated successfully' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     // DELETE /units/:unitNumber
     if (request.method === 'DELETE' && /^\/\d+$/.test(pathname)) {
       const unitNumber = parseInt(pathname.split('/')[1]);
-      const result = await sql`DELETE FROM units WHERE unit_number = ${unitNumber}`;
-      if (result.length > 0) {
-        return new Response(JSON.stringify({ message: 'Unit deleted successfully' }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      } else {
+      // Check if unit exists
+      const existingUnit = await sql`SELECT * FROM units WHERE unit_number = ${unitNumber}`;      
+      if (existingUnit.length === 0) {
         return new Response(JSON.stringify({ message: 'Unit not found' }), {
           status: 404,
           headers: { 'Content-Type': 'application/json' }
         });
       }
+      await sql`DELETE FROM units WHERE unit_number = ${unitNumber}`;
+      return new Response(JSON.stringify({ message: 'Unit deleted successfully' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     // Not found
