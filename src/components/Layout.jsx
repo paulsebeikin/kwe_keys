@@ -7,12 +7,11 @@ export default function Layout({ children }) {
   const location = useLocation();
 
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer lg:drawer-open min-h-screen">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex flex-col">        
+      <div className="drawer-content flex flex-col h-full min-h-0">
         <Navbar/>
-        {/* Page content */}
-        <div className="p-4">
+        <div className="p-4 flex-1 min-h-0 flex flex-col">
           {children}
         </div>
       </div>

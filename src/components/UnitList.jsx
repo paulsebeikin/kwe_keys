@@ -93,7 +93,8 @@ function UnitList() {
         <button type="submit" className="btn btn-primary">Add Unit</button>
       </form>
 
-      <div className="overflow-x-auto">
+      {/* Table container with fixed height and scroll */}
+      <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto max-h-[calc(100vh-260px)]">
         <table className="table">
           <thead>
             <tr>

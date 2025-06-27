@@ -89,7 +89,8 @@ function RemoteList() {
   }, []);
 
   return (
-    <div className="space-y-4">
+    // Make the outer container a flex column and fill height
+    <div className="space-y-4 flex flex-col h-full min-h-0">
       <h2 className="text-2xl font-bold">Remotes</h2>
       
       <input
@@ -139,7 +140,8 @@ function RemoteList() {
         <button type="submit" className="btn btn-primary">Add Remote</button>
       </form>
 
-      <div className="overflow-x-auto">
+      {/* Table container fills remaining space and scrolls */}
+      <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto max-h-[calc(100vh-260px)]">
         <table className="table">
           <thead>
             <tr>
