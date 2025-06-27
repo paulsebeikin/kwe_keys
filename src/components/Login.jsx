@@ -74,7 +74,7 @@ function Login({ inline = false, onSuccess = null }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center min-h-screen bg-base-200">
-      <div className="card bg-base-100 shadow-xl w-96">
+      <div className="card bg-base-100 shadow-xl w-full max-w-xs sm:max-w-md">
         <div className="card-body">
           <h2 className="card-title justify-center mb-4">Sign in to your account</h2>
           {formContent}

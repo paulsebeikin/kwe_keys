@@ -101,7 +101,7 @@ function RemoteList() {
         className="input input-bordered w-full max-w-xs"
       />
 
-      <form onSubmit={addRemote} className="flex gap-2">
+      <form onSubmit={addRemote} className="flex flex-col sm:flex-row gap-2">
         <select
           value={newRemote.unitNumber}
           onChange={e => setNewRemote({...newRemote, unitNumber: e.target.value})}
@@ -142,7 +142,7 @@ function RemoteList() {
 
       {/* Table container fills remaining space and scrolls */}
       <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto max-h-[calc(100vh-260px)]">
-        <table className="table">
+        <table className="table w-full min-w-[700px]">
           <thead>
             <tr>
               <th>Unit Number</th>

@@ -5,7 +5,7 @@ export default function Navbar() {
   const { token, logout, firstName, lastName } = useAuth();
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-base-100 flex flex-wrap">
       <div className="flex-none lg:hidden">
         <label htmlFor="my-drawer-2" className="btn btn-square btn-ghost">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current">
@@ -14,12 +14,12 @@ export default function Navbar() {
         </label>
       </div>
       <div className="flex-1">
-        <span className="text-xl font-bold">Kingswood Estate Management</span>
+        <span className="text-xl font-bold">KWE Management</span>
       </div>
-      <div className="flex-none gap-2 flex items-center">
+      <div className="flex-none gap-2 flex items-center flex-wrap">
         {token ? (
           <>
-            <span className="font-medium mr-2">{firstName} {lastName}</span>
+            <span className="font-medium mr-2 hidden lg:inline">{firstName} {lastName}</span>
             <button onClick={logout} className="btn btn-ghost">Logout</button>
           </>
         ) : (

@@ -11,23 +11,37 @@ export default function Layout({ children }) {
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col h-full min-h-0">
         <Navbar/>
-        <div className="p-4 flex-1 min-h-0 flex flex-col">
+        <div className="p-2 sm:p-4 flex-1 min-h-0 flex flex-col">
           {children}
         </div>
       </div>
-
       {/* Sidebar: Only show if logged in */}
       {token && (
-        <div className="drawer-side">
+        <div className="drawer-side z-40">
           <label htmlFor="my-drawer-2" className="drawer-overlay"></label> 
-          <ul className="menu p-4 w-40 min-h-full bg-base-200">
+          <ul className="menu p-2 sm:p-4 w-56 min-h-full bg-base-200">
             <li>
-              <Link to="/units" className={location.pathname === '/units' ? 'active' : ''}>
+              <Link
+                to="/units"
+                className={location.pathname === '/units' ? 'active' : ''}
+                onClick={() => {
+                  // Hide sidebar on mobile by unchecking the drawer toggle
+                  const drawer = document.getElementById('my-drawer-2');
+                  if (drawer && window.innerWidth < 1024) drawer.checked = false;
+                }}
+              >
                 Units
               </Link>
             </li>
             <li>
-              <Link to="/remotes" className={location.pathname === '/remotes' ? 'active' : ''}>
+              <Link
+                to="/remotes"
+                className={location.pathname === '/remotes' ? 'active' : ''}
+                onClick={() => {
+                  const drawer = document.getElementById('my-drawer-2');
+                  if (drawer && window.innerWidth < 1024) drawer.checked = false;
+                }}
+              >
                 Remotes
               </Link>
             </li>

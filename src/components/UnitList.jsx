@@ -75,7 +75,7 @@ function UnitList() {
         className="input input-bordered w-full max-w-xs"
       />
 
-      <form onSubmit={addUnit} className="flex gap-2">
+      <form onSubmit={addUnit} className="flex flex-col sm:flex-row gap-2">
         <input
           type="number"
           placeholder="Unit Number"
@@ -95,7 +95,7 @@ function UnitList() {
 
       {/* Table container with fixed height and scroll */}
       <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto max-h-[calc(100vh-260px)]">
-        <table className="table">
+        <table className="table w-full min-w-[500px]">
           <thead>
             <tr>
               <th>Unit Number</th>
