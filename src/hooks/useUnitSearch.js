@@ -7,9 +7,7 @@ export default function useUnitSearch(items, key = 'unitNumber') {
   const filteredItems = useMemo(() => {
     if (!search) return items;
     return items.filter(item =>
-      String(item[key] ?? '')
-        .toLowerCase()
-        .includes(search.toLowerCase())
+      String(item[key] ?? '') === search
     );
   }, [items, search, key]);
   return { search, setSearch, filteredItems };
