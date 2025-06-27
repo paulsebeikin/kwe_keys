@@ -1,2 +1,2 @@
-/api/*  https://kwe.netlify.app/:splat 200
+/api/*  https://kwe.netlify.app/api/:splat 200
 /*      /index.html  200
